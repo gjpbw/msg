@@ -1,6 +1,5 @@
 <?php
-namespace msg;
-class Slack
+class MsgSlack
 {
 	private function run($msg, $chat_id)
 	{
@@ -18,7 +17,7 @@ class Slack
 		curl_close($ch); // завершаем сессию
 
 		if (($output) !=='ok') {
-			\Msg::error('неверный ответ на запрос. ответ= ' . $output);
+			Msg::error('неверный ответ на запрос. ответ= ' . $output);
 			$output = '';
 		}
 		return $output;
@@ -29,7 +28,7 @@ class Slack
 		$output = '';
 			$chat_id = $properties['sendTo'];
 			if (empty($chat_id))
-				\Msg::modx('empty sendTo (chat_id)');
+				Msg::modx('empty sendTo (chat_id)');
 			else {
 				if (is_array($chat_id)){
 					$chat_ids = $chat_id;

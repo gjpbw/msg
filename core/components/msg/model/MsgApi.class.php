@@ -1,6 +1,5 @@
 <?php
-namespace msg;
-class Api
+class MsgApi
 {
     /** @var string */
     protected $server;
@@ -20,11 +19,11 @@ class Api
         $output = '';
 
         if (empty($this->server))
-            \Msg::modx('empty server');
+            Msg::modx('empty server');
         else {
             $sendTo = $properties['sendTo'];
             if (empty($sendTo))
-                \Msg::modx('empty sendTo ' . $properties['sendTo']);
+                Msg::modx('empty sendTo ' . $properties['sendTo']);
             else {
 
                 $properties['msg'] = $msg;
@@ -32,12 +31,12 @@ class Api
                     $sendTos = $sendTo;
                     foreach($sendTos as $sendTo) {
                         $properties['sendTo'] = $sendTo;
-                        $output = \Msg::curl($this->server, $properties, $this->proxy);
+                        $output = Msg::curl($this->server, $properties, $this->proxy);
                     }
                 }
                 else {
                     $properties['sendTo'] = $sendTo;
-                    $output = \Msg::curl($this->server, $properties, $this->proxy);
+                    $output = Msg::curl($this->server, $properties, $this->proxy);
                 }
             }
         }

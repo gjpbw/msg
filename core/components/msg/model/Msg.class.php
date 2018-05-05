@@ -38,12 +38,17 @@ class Msg
                 $className = $this->providers[$providerName]['provider'];
             } else
                 $className = $providerName;
-            $className = ucfirst($className);
-            $file = dirname(__FILE__) . '/' . strtolower($className) . '.class.php';
+            $className = 'Msg' . ucfirst($className);
+            $file = dirname(__FILE__) . '/' . $className . '.class.php';
             if (file_exists($file)) {
                 include_once $file;
-                $classNameFull = 'msg\\' . $className;
-                $this->providers[$providerName]['obj'] = new $classNameFull ($this->providers[$providerName]);
+
+                if (isset($this->providers[$providerName]))
+                    $properties = $this->providers[$providerName];
+                else
+                    $properties = array();
+
+                $this->providers[$providerName]['obj'] = new $className ($properties);
             } else
                 self::modx('ERROR: File is not found: ' . $file);
         }
@@ -65,9 +70,14 @@ class Msg
 			else
 				$msg = $input;
             foreach ($a as $provider => $v) {
-				$providerName = strtolower($this->providers[$provider]['provider']);
+                if (isset($this->providers[$provider]['provider']))
+				    $providerName = strtolower($this->providers[$provider]['provider']);
+                else
+                    $providerName = '';
+
 				if (empty($providerName))
 					$providerName = $provider;
+
 				$s = explode(',', $v);
 				foreach ($s as $sendTo) {
 					$sendTo = trim($sendTo);
@@ -151,10 +161,10 @@ class Msg
 	public static function email($msg, $sendTo, $properties = array())
 	{
         $output = '';
-		$file = dirname(__FILE__) . '/email.class.php';
+		$file = dirname(__FILE__) . 'MsgEmail.class.php';
 		if (file_exists($file)) {
 			include_once $file;
-			$email = new msg\Email();
+			$email = new MsgEmail();
 			$properties['sendTo'] = $sendTo;
             $output = $email->msg($msg, $properties);
 		}
@@ -168,7 +178,7 @@ class Msg
 		return self::__callStatic($event, [$properties['msg'], $properties]);
 	}
 //**************************************************************************************************************************************************
-    public static function curl($server, array $properties = array(), $proxy = '', $isGet = false)
+    public static function curl($server, array $properties = array(), $proxy = '', $timeout = 3, $isGet = false)
     {
         foreach ($properties as $k => $v)
             $server = str_replace('[[+' . $k . ']]', $v, $server);
@@ -179,7 +189,7 @@ class Msg
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);// разрешаем перенаправление
         curl_setopt($ch, CURLOPT_MAXREDIRS, 3);// лимит перенаправлений
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // указываем, что результат запроса следует передать в переменную, а не вывести на экран
-        curl_setopt($ch, CURLOPT_TIMEOUT, 3); // таймаут соединения
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout); // таймаут соединения
 
         if (!$isGet) {
             curl_setopt($ch, CURLOPT_POST, 1); // указываем, что данные надо передать именно методом POST

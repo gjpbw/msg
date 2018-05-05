@@ -1,6 +1,5 @@
 <?php
-namespace msg;
-class Xpdo
+class MsgXpdo
 {
     /** @var string */
     protected $xpdoName;
@@ -38,10 +37,10 @@ class Xpdo
         $output = '';
 
         if (empty($this->xpdoName))
-            \Msg::modx('empty xpdoName');
+            Msg::modx('empty xpdoName');
         else{
             if (empty($this->className))
-                \Msg::modx('empty class');
+                Msg::modx('empty class');
             else {
                 $xpdo =& self::getXpdo($this->xpdoName);
                 if ($this->method == 'insert') {
@@ -55,7 +54,7 @@ class Xpdo
                         $obj->remove();
                         $output = 'ok';
                     } else
-                        \Msg::modx(__NAMESPACE__ . '\\' . __CLASS__ . ': Object not found');
+                        Msg::modx(__CLASS__ . ': Object not found');
                 }elseif ($this->method == 'update'){
                     $obj = $xpdo->getObject($this->className, $properties['where']);
                     if (!empty($obj)){
@@ -65,7 +64,7 @@ class Xpdo
                         $obj->save();
                         $output = 'ok';
                     } else
-                        \Msg::modx(__NAMESPACE__ . '\\' . __CLASS__ . ': Object not found');
+                        Msg::modx(__CLASS__ . ': Object not found');
                 }
             }
         }

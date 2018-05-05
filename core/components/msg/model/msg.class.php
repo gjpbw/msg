@@ -139,7 +139,7 @@ class Msg
 		if ($modx->user->isMember('Administrator')) {
 			$s = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
 			$msg = '[' . $s['class'] . $s['type'] . $s['function'] . '()] ' . $msg;
-            self::modx($msg,MODX_LOG_LEVEL_DEBUG);
+            self::modx($msg,4);
 			$output = self::__callStatic('debug', array($msg));
 		}
         return $output;
@@ -151,7 +151,7 @@ class Msg
 //		MODX_LOG_LEVEL_WARN = 2
 //		MODX_LOG_LEVEL_INFO = 3
 //		MODX_LOG_LEVEL_DEBUG = 4
-    public static function modx($msg, $logLevel = MODX_LOG_LEVEL_ERROR)
+    public static function modx($msg, $logLevel = 1)
     {
         global $modx;
         $modx->log($logLevel, $msg);

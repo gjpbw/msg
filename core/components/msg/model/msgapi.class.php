@@ -5,12 +5,18 @@ class MsgApi
     protected $server;
     /** @var string */
     protected $proxy;
+    /** @var int */
+    protected $timeout;
 
 //**************************************************************************************************************************************************
     function __construct(array $properties = array())
     {
         $this->proxy = $properties['proxy'];
         $this->server = $properties['server'];
+
+        $this->timeout = $properties['timeout'];
+        if (empty($this->timeout))
+            $this->timeout = 3;
     }
 
 //**************************************************************************************************************************************************
@@ -31,12 +37,12 @@ class MsgApi
                     $sendTos = $sendTo;
                     foreach($sendTos as $sendTo) {
                         $properties['sendTo'] = $sendTo;
-                        $output = Msg::curl($this->server, $properties, $this->proxy);
+                        $output = Msg::curl($this->server, $properties, $this->proxy, $this->timeout);
                     }
                 }
                 else {
                     $properties['sendTo'] = $sendTo;
-                    $output = Msg::curl($this->server, $properties, $this->proxy);
+                    $output = Msg::curl($this->server, $properties, $this->proxy, $this->timeout);
                 }
             }
         }

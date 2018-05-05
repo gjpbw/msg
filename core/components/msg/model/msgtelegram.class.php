@@ -5,11 +5,16 @@ class MsgTelegram
     protected $server;
     /** @var string */
     protected $proxy;
+    /** @var int */
+    protected $timeout;
 
 //**************************************************************************************************************************************************
     function __construct(array $properties = array())
     {
         $this->proxy = $properties['proxy'];
+        $this->timeout = $properties['timeout'];
+        if (empty($this->timeout))
+            $this->timeout = 3;
 
         $token = $properties['token'];
         if (empty($token))
@@ -51,12 +56,12 @@ class MsgTelegram
                     $chat_ids = $chat_id;
                     foreach($chat_ids as $chat_id) {
                         $properties['chat_id'] = $chat_id;
-                        $output = Msg::curl($this->server . '/sendMessage', $properties, $this->proxy, 5);
+                        $output = Msg::curl($this->server . '/sendMessage', $properties, $this->proxy, $this->timeout);
                     }
                 }
                 else{
                     $properties['chat_id'] = $chat_id;
-                    $output = Msg::curl($this->server . '/sendMessage', $properties, $this->proxy, 5);
+                    $output = Msg::curl($this->server . '/sendMessage', $properties, $this->proxy, $this->timeout);
                 }
             }
         }

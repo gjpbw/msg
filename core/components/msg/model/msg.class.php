@@ -71,7 +71,7 @@ class Msg
 				$msg = $input;
             foreach ($a as $provider => $v) {
                 if (isset($this->providers[$provider]['provider']))
-				    $providerName = strtolower($this->providers[$provider]['provider']);
+                    $providerName = strtolower($this->providers[$provider]['provider']);
                 else
                     $providerName = '';
 
@@ -161,7 +161,7 @@ class Msg
 	public static function email($msg, $sendTo, $properties = array())
 	{
         $output = '';
-		$file = dirname(__FILE__) . 'MsgEmail.class.php';
+		$file = dirname(__FILE__) . 'msgemail.class.php';
 		if (file_exists($file)) {
 			include_once $file;
 			$email = new MsgEmail();
@@ -211,7 +211,7 @@ class Msg
 //**************************************************************************************************************************************************
     public static function test($properties = array())
     {
-        return 'test';
+        return 'test'.json_encode($properties);
     }
 }
 

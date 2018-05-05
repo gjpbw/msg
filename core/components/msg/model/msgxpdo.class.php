@@ -66,6 +66,7 @@ class MsgXpdo
                     } else
                         Msg::modx(__CLASS__ . ': Object not found');
                 }
+                Msg::modx(__CLASS__ . $msg, 3);
             }
         }
         return $output;

@@ -64,6 +64,7 @@ class Msg
         global $modx;
         $output = '';
 
+        $limit = 0;
         $modx->lexicon->load('msg:default');
 
         $a = $this->events[$name];
@@ -73,15 +74,14 @@ class Msg
             else
                 $msg = $input;
             foreach ($a as $provider => $v) {
+                if ($provider == 'limit'){
+                    $limit = (int) $v;
+                }
+
                 if (isset($this->providers[$provider]['provider']))
                     $providerName = strtolower($this->providers[$provider]['provider']);
                 else
                     $providerName = '';
-
-                if (isset($this->providers[$provider]['limit']))
-                    $limit = strtolower($this->providers[$provider]['limit']);
-                else
-                    $limit = null;
 
                 if (empty($providerName))
                     $providerName = $provider;
@@ -104,9 +104,9 @@ class Msg
                         if ((!empty($lastEventTime)) && ($lastEventTime == $hourTime)) {
                             $lastEventCount = $modx->cacheManager->get('msg.lastEventCount.' . $keySuffix);
                             if (!isset($lastEventCount))
-                                $lastEventCount = 1;
-                            else
-                                $lastEventCount++;
+                                $lastEventCount = 1;    //если lastEventCount нет, lastEventTime значит 1 раз уже событие было
+
+                            $lastEventCount++;
 
                             $modx->cacheManager->set('msg.lastEventCount.' . $keySuffix, $lastEventCount);
                             if ($lastEventCount == $limit)

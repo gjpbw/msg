@@ -39,7 +39,7 @@ class Msg
             } else
                 $className = $providerName;
             $className = 'Msg' . ucfirst($className);
-            $file = dirname(__FILE__) . '/' . $className . '.class.php';
+            $file = dirname(__FILE__) . '/' . strtolower($className) . '.class.php';
             if (file_exists($file)) {
                 include_once $file;
 
@@ -61,35 +61,67 @@ class Msg
 //**************************************************************************************************************************************************
     public function event($name, $input, array $properties)
     {
+        global $modx;
         $output = '';
+
+        $modx->lexicon->load('msg:default');
 
         $a = $this->events[$name];
         if (is_array($a)) {
-			if (is_string($input))
-				$msg = $name . ": \n" . $input;
-			else
-				$msg = $input;
+            if (is_string($input))
+                $msg = $name . ": \n" . $input;
+            else
+                $msg = $input;
             foreach ($a as $provider => $v) {
                 if (isset($this->providers[$provider]['provider']))
                     $providerName = strtolower($this->providers[$provider]['provider']);
                 else
                     $providerName = '';
 
-				if (empty($providerName))
-					$providerName = $provider;
+                if (isset($this->providers[$provider]['limit']))
+                    $limit = strtolower($this->providers[$provider]['limit']);
+                else
+                    $limit = null;
 
-				$s = explode(',', $v);
-				foreach ($s as $sendTo) {
-					$sendTo = trim($sendTo);
-					if ($sendTo == 'sendTo')
-						$sendTo = $properties['sendTo'];
-					elseif ($sendTo !== 'self')
-						$sendTo = $this->sendTo[$providerName][$sendTo];
+                if (empty($providerName))
+                    $providerName = $provider;
 
-					$properties['sendTo'] = $sendTo;
+                $s = explode(',', $v);
+                foreach ($s as $sendTo) {
+                    $sendTo = trim($sendTo);
+                    if ($sendTo == 'sendTo')
+                        $sendTo = $properties['sendTo'];
+                    elseif ($sendTo !== 'self')
+                        $sendTo = $this->sendTo[$providerName][$sendTo];
 
-					$output .= $this->msg($provider, $msg, $properties);
-				}
+                    $properties['sendTo'] = $sendTo;
+
+                    $msgLimit = false;
+                    if (!empty($limit)) {
+                        $hourTime = floor(time() / 3600);
+                        $keySuffix = $name . '.' . $sendTo;
+                        $lastEventTime = $modx->cacheManager->get('msg.lastEventTime.' . $keySuffix);
+                        if ((!empty($lastEventTime)) && ($lastEventTime == $hourTime)) {
+                            $lastEventCount = $modx->cacheManager->get('msg.lastEventCount.' . $keySuffix);
+                            if (!isset($lastEventCount))
+                                $lastEventCount = 1;
+                            else
+                                $lastEventCount++;
+
+                            $modx->cacheManager->set('msg.lastEventCount.' . $keySuffix, $lastEventCount);
+                            if ($lastEventCount == $limit)
+                                $msg = $modx->lexicon('msg_limit', array('event' => $name)) . "\n" . $msg;
+                            elseif ($lastEventCount > $limit)
+                                $msgLimit = true;
+
+                        } else {
+                            $modx->cacheManager->set('msg.lastEventTime.' . $keySuffix, $hourTime);
+                            $modx->cacheManager->delete('msg.lastEventCount.' . $keySuffix);
+                        }
+                    }
+                    if (!$msgLimit)
+                        $output .= $this->msg($provider, $msg, $properties);
+                }
             }
         } else
             self::modx('Error: event "' . $name . '" not found. Fix file "\core\elements\etc\msg\events.ini"');
@@ -103,10 +135,10 @@ class Msg
         if (!isset($msg))
             $msg = new Msg();
 
-		$input = $arguments[0];
-		$properties=array();
-		if (count($arguments) > 1)
-			$properties = $arguments[1];
+        $input = $arguments[0];
+        $properties=array();
+        if (count($arguments) > 1)
+            $properties = $arguments[1];
         return $msg->event($name, $input, $properties);
     }
 
@@ -116,14 +148,14 @@ class Msg
         global $modx;
         $s = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
 
-		if (is_array($msg))
-			$msg = json_encode($msg);
-		elseif (!is_string($msg))
-			$msg = (string) $msg;
+        if (is_array($msg))
+            $msg = json_encode($msg);
+        elseif (!is_string($msg))
+            $msg = (string) $msg;
 
         $msg = $msg."\n".
-			"============================\n".
-			"[".$s['class'].$s['type'].$s['function']."()]\n".
+            "============================\n".
+            "[".$s['class'].$s['type'].$s['function']."()]\n".
             "user = ".$modx->user->username."\n".
             "url = ".MODX_URL_SCHEME.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."\n".
             "(line) file = (".$s['line'].") ".$s['file']."\n";
@@ -135,13 +167,13 @@ class Msg
     public static function debug($msg)
     {
         global $modx;
-		$output = '';
-		if ($modx->user->isMember('Administrator')) {
-			$s = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
-			$msg = '[' . $s['class'] . $s['type'] . $s['function'] . '()] ' . $msg;
+        $output = '';
+        if ($modx->user->isMember('Administrator')) {
+            $s = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+            $msg = '[' . $s['class'] . $s['type'] . $s['function'] . '()] ' . $msg;
             self::modx($msg,4);
-			$output = self::__callStatic('debug', array($msg));
-		}
+            $output = self::__callStatic('debug', array($msg));
+        }
         return $output;
     }
 
@@ -158,25 +190,25 @@ class Msg
     }
 //**************************************************************************************************************************************************
 
-	public static function email($msg, $sendTo, $properties = array())
-	{
+    public static function email($msg, $sendTo, $properties = array())
+    {
         $output = '';
-		$file = dirname(__FILE__) . 'msgemail.class.php';
-		if (file_exists($file)) {
-			include_once $file;
-			$email = new MsgEmail();
-			$properties['sendTo'] = $sendTo;
+        $file = dirname(__FILE__) . 'msgemail.class.php';
+        if (file_exists($file)) {
+            include_once $file;
+            $email = new MsgEmail();
+            $properties['sendTo'] = $sendTo;
             $output = $email->msg($msg, $properties);
-		}
+        }
         return $output;
-	}
+    }
 //**************************************************************************************************************************************************
-	public static function send($properties = array())
-	{
-		$event = $properties['event'];
-		unset ($properties['event']);
-		return self::__callStatic($event, [$properties['msg'], $properties]);
-	}
+    public static function send($properties = array())
+    {
+        $event = $properties['event'];
+        unset ($properties['event']);
+        return self::__callStatic($event, [$properties['msg'], $properties]);
+    }
 //**************************************************************************************************************************************************
     public static function curl($server, array $properties = array(), $proxy = '', $timeout = 3, $isGet = false)
     {

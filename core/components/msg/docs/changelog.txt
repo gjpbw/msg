@@ -1,4 +1,4 @@
 Changelog for msg.
 
-2.0.0-pl
+2.1.0-pl
 ==============

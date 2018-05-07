@@ -31,6 +31,7 @@ class MsgEmail
 
 			$modx->mail->address('to', $sendTo, $sendTo);
 			$modx->mail->address('reply-to', $modx->getOption('emailsender'));
+            $modx->mail->setHTML(true);
 			$output = $modx->mail->send();
 			$modx->mail->reset();
 

@@ -1,11 +1,11 @@
 <?php
 
 return [
-    'partners' => [
-        'file' => 'partners',
+    'msg' => [
+        'file' => 'msg',
         'description' => '',
         'events' => [
-            'OnManagerPageInit' => [],
+            'OnMODXInit' => [],
         ],
     ],
 ];

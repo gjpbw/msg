@@ -92,6 +92,7 @@ class Msg
     {
         global $modx;
         $output = '';
+        $msgSuffix = '';
 
         $limit = 0;
         $modx->lexicon->load('msg:default');
@@ -145,7 +146,7 @@ class Msg
 
                                 $modx->cacheManager->set('msg.lastEventCount.' . $keySuffix, $lastEventCount);
                                 if ($lastEventCount == $limit)
-                                    $msg = $msg . "\n***********\n" . $modx->lexicon('msg_limit', array('event' => $name));
+                                    $msgSuffix = "\n***********\n" . $modx->lexicon('msg_limit', array('event' => $name));
                                 elseif ($lastEventCount > $limit)
                                     $msgLimit = true;
 
@@ -155,7 +156,7 @@ class Msg
                             }
                         }
                         if (!$msgLimit)
-                            $output .= $this->msg($provider, $msg, $properties);
+                            $output .= $this->msg($provider, $msg . $msgSuffix, $properties);
                     }
                 }
             }
@@ -266,7 +267,7 @@ class Msg
             "url = " . MODX_URL_SCHEME . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] . "\n" .
             "(line) file = (" . $s['line'] . ") " . $s['file'] . "\n";
         self::modx($msg);
-        return self::__callStatic('error', array($msg));
+        return self::__callStatic('curlError', array($msg));
     }
 
 //**************************************************************************************************************************************************
@@ -274,8 +275,8 @@ class Msg
     {
         global $modx;
         $modx->lexicon->load('msg:default');
-        foreach ($properties as $k => $v)
-            $server = str_replace('[[+' . $k . ']]', $v, $server);
+//        foreach ($properties as $k => $v)
+//            $properties[$k] = str_replace('"', '\"', $v);
 
         $ch = curl_init(); // инициализируем сессию curl
         curl_setopt($ch, CURLOPT_URL, $server); // указываем URL, куда отправлять запрос
@@ -296,7 +297,7 @@ class Msg
         $output = curl_exec($ch); // выполняем запрос
 
         if (curl_errno($ch)) {
-            Msg::curlError($modx->lexicon('msg_curlError', array('input' => json_encode($properties), 'output' => $output, 'error' => curl_error($ch))));
+            Msg::curlError('server=' . $server . "\n". $modx->lexicon('msg_curlError', array('input' => json_encode($properties, JSON_UNESCAPED_UNICODE ), 'output' => $output, 'error' => curl_error($ch))));
         }
         curl_close($ch); // завершаем сессию
         return $output;

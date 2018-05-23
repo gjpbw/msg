@@ -41,7 +41,7 @@ class MsgApi
             $sendTo = $properties['sendTo'];
             unset($properties['sendTo']);
             if (empty($sendTo))
-                Msg::modx('empty sendTo ' . json_encode($properties));
+                $output = Msg::curl($server, $properties, $this->proxy, $this->timeout);
             else {
                 if (is_array($sendTo)) {
                     $sendTos = $sendTo;

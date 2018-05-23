@@ -18,6 +18,32 @@ class Msg
         $this->sendTo = $this->parse_ini_file('sendTo.ini');
     }
 //**************************************************************************************************************************************************
+    public function routeEvent($eventName)
+    {
+        switch ($eventName) {
+            case 'OnMODXInit':
+                spl_autoload_register(function ($class) {
+                    if ((strpos($class, '/')) == false) { // что бы не подсунули '../'
+                        $name = strtolower($class);
+                        $filename = strtolower(MODX_CORE_PATH.'components/'.$name.'/model/'.$name.'/'.$name.'.class.php');
+                        if (file_exists($filename))
+                            include_once($filename);
+                        else{
+                            $filename = strtolower(MODX_CORE_PATH.'components/'.$name.'/model/'.$name.'.class.php');
+                            if (file_exists($filename))
+                                include_once($filename);
+                            else{
+                                $filename = strtolower(MODX_CORE_PATH.'elements/class/'.$name.'.class.php');
+                                if (file_exists($filename))
+                                    include_once($filename);
+                            }
+                        }
+                    }
+                });
+                break;
+        }
+    }
+//**************************************************************************************************************************************************
     private function parse_ini_file($name)
     {
         $a = array();

@@ -11,7 +11,8 @@ $modx =& $transport->xpdo;
 $success = false;
 switch ($options[xPDOTransport::PACKAGE_ACTION]) {
     case xPDOTransport::ACTION_INSTALL:
-        $path = MODX_CORE_PATH.'elements/etc/msg/';
+    case xPDOTransport::ACTION_UPGRADE:
+        $path = MODX_CORE_PATH . 'elements/etc/msg/';
         if (!file_exists($path)) {
             mkdir($path, 0744, true);
             $source = MODX_CORE_PATH . 'components/msg/etc/msg';
@@ -20,8 +21,6 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
                 copy($file, $path . basename($file));
             $modx->log(modX::LOG_LEVEL_INFO, 'To configure, change the files in the directory: ' . $path);
         }
-        break;
-    case xPDOTransport::ACTION_UPGRADE:
         $success = true;
         break;
 

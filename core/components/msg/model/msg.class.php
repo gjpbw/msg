@@ -236,8 +236,30 @@ class Msg
         return self::__callStatic($event, [$properties['msg'], $properties]);
     }
 //**************************************************************************************************************************************************
+    public static function curlError($msg)
+    {
+        global $modx;
+        $s = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+
+        if (is_array($msg))
+            $msg = json_encode($msg);
+        elseif (!is_string($msg))
+            $msg = (string) $msg;
+
+        $msg = $msg."\n".
+            "============================\n".
+            "[".$s['class'].$s['type'].$s['function']."()]\n".
+            "user = ".$modx->user->username."\n".
+            "url = ".MODX_URL_SCHEME.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."\n".
+            "(line) file = (".$s['line'].") ".$s['file']."\n";
+        self::modx($msg);
+        return self::__callStatic('error', array($msg));
+    }
+//**************************************************************************************************************************************************
     public static function curl($server, array $properties = array(), $proxy = '', $timeout = 3, $isGet = false)
     {
+        global $modx;
+        $modx->lexicon->load('msg:default');
         foreach ($properties as $k => $v)
             $server = str_replace('[[+' . $k . ']]', $v, $server);
 
@@ -260,7 +282,7 @@ class Msg
         $output = curl_exec($ch); // выполняем запрос
 
         if (curl_errno($ch)) {
-            Msg::curlError('Вызов cURL завершился с ошибкой: "' . curl_error($ch) . '". Ответ= ' . $output);
+            Msg::curlError($modx->lexicon('msg_curlError', array('input' => json_encode($properties), 'output' => $output, 'error' => curl_error($ch))));
         }
         curl_close($ch); // завершаем сессию
         return $output;

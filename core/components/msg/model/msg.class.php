@@ -2,7 +2,7 @@
 
 class Msg
 {
-    const MODX_ELEMENTS_PATH = MODX_CORE_PATH.'elements/';
+    const MODX_ELEMENTS_PATH = MODX_CORE_PATH . 'elements/';
     /** @var array */
     protected $providers;
     /** @var array */
@@ -17,6 +17,7 @@ class Msg
         $this->events = $this->parse_ini_file('events.ini');
         $this->sendTo = $this->parse_ini_file('sendTo.ini');
     }
+
 //**************************************************************************************************************************************************
     public function routeEvent($eventName)
     {
@@ -25,15 +26,15 @@ class Msg
                 spl_autoload_register(function ($class) {
                     if ((strpos($class, '/')) == false) { // что бы не подсунули '../'
                         $name = strtolower($class);
-                        $filename = strtolower(MODX_CORE_PATH.'components/'.$name.'/model/'.$name.'/'.$name.'.class.php');
+                        $filename = strtolower(MODX_CORE_PATH . 'components/' . $name . '/model/' . $name . '/' . $name . '.class.php');
                         if (file_exists($filename))
                             include_once($filename);
-                        else{
-                            $filename = strtolower(MODX_CORE_PATH.'components/'.$name.'/model/'.$name.'.class.php');
+                        else {
+                            $filename = strtolower(MODX_CORE_PATH . 'components/' . $name . '/model/' . $name . '.class.php');
                             if (file_exists($filename))
                                 include_once($filename);
-                            else{
-                                $filename = strtolower(MODX_CORE_PATH.'elements/class/'.$name.'.class.php');
+                            else {
+                                $filename = strtolower(MODX_CORE_PATH . 'elements/class/' . $name . '.class.php');
                                 if (file_exists($filename))
                                     include_once($filename);
                             }
@@ -43,12 +44,13 @@ class Msg
                 break;
         }
     }
+
 //**************************************************************************************************************************************************
     private function parse_ini_file($name)
     {
         $a = array();
 
-        $file = self::MODX_ELEMENTS_PATH.'etc/msg/' . $name;
+        $file = self::MODX_ELEMENTS_PATH . 'etc/msg/' . $name;
         if (file_exists($file))
             $a = parse_ini_file($file, true);
         else
@@ -56,6 +58,7 @@ class Msg
 
         return $a;
     }
+
 //**************************************************************************************************************************************************
     public function msg($providerName, $msg, $arguments)
     {
@@ -102,6 +105,8 @@ class Msg
             foreach ($a as $provider => $v) {
                 if ($provider == 'limit') {
                     $limit = (int)$v;
+                } elseif ($provider == 'properties') {
+                    $properties = array_merge($v, $properties);
                 } else {
                     if (isset($this->providers[$provider]['provider']))
                         $providerName = strtolower($this->providers[$provider]['provider']);
@@ -124,7 +129,12 @@ class Msg
                         $msgLimit = false;
                         if (!empty($limit)) {
                             $hourTime = floor(time() / 3600);
-                            $keySuffix = $name . '.' . $sendTo;
+
+                            if ($sendTo == 'self')
+                                $keySuffix = $name . '.' . $modx->user->id;
+                            else
+                                $keySuffix = $name . '.' . $sendTo;
+
                             $lastEventTime = $modx->cacheManager->get('msg.lastEventTime.' . $keySuffix);
                             if ((!empty($lastEventTime)) && ($lastEventTime == $hourTime)) {
                                 $lastEventCount = $modx->cacheManager->get('msg.lastEventCount.' . $keySuffix);
@@ -162,7 +172,7 @@ class Msg
             $msg = new Msg();
 
         $input = $arguments[0];
-        $properties=array();
+        $properties = array();
         if (count($arguments) > 1)
             $properties = $arguments[1];
         return $msg->event($name, $input, $properties);
@@ -177,14 +187,14 @@ class Msg
         if (is_array($msg))
             $msg = json_encode($msg);
         elseif (!is_string($msg))
-            $msg = (string) $msg;
+            $msg = (string)$msg;
 
-        $msg = $msg."\n".
-            "============================\n".
-            "[".$s['class'].$s['type'].$s['function']."()]\n".
-            "user = ".$modx->user->username."\n".
-            "url = ".MODX_URL_SCHEME.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."\n".
-            "(line) file = (".$s['line'].") ".$s['file']."\n";
+        $msg = $msg . "\n" .
+            "============================\n" .
+            "[" . $s['class'] . $s['type'] . $s['function'] . "()]\n" .
+            "user = " . $modx->user->username . "\n" .
+            "url = " . MODX_URL_SCHEME . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] . "\n" .
+            "(line) file = (" . $s['line'] . ") " . $s['file'] . "\n";
         self::modx($msg);
         return self::__callStatic('error', array($msg));
     }
@@ -197,7 +207,7 @@ class Msg
         if ($modx->user->isMember('Administrator')) {
             $s = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
             $msg = '[' . $s['class'] . $s['type'] . $s['function'] . '()] ' . $msg;
-            self::modx($msg,4);
+            self::modx($msg, 4);
             $output = self::__callStatic('debug', array($msg));
         }
         return $output;
@@ -214,6 +224,7 @@ class Msg
         global $modx;
         $modx->log($logLevel, $msg);
     }
+
 //**************************************************************************************************************************************************
 
     public static function email($msg, $sendTo, $properties = array())
@@ -228,6 +239,7 @@ class Msg
         }
         return $output;
     }
+
 //**************************************************************************************************************************************************
     public static function send($properties = array())
     {
@@ -235,6 +247,7 @@ class Msg
         unset ($properties['event']);
         return self::__callStatic($event, [$properties['msg'], $properties]);
     }
+
 //**************************************************************************************************************************************************
     public static function curlError($msg)
     {
@@ -244,17 +257,18 @@ class Msg
         if (is_array($msg))
             $msg = json_encode($msg);
         elseif (!is_string($msg))
-            $msg = (string) $msg;
+            $msg = (string)$msg;
 
-        $msg = $msg."\n".
-            "============================\n".
-            "[".$s['class'].$s['type'].$s['function']."()]\n".
-            "user = ".$modx->user->username."\n".
-            "url = ".MODX_URL_SCHEME.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."\n".
-            "(line) file = (".$s['line'].") ".$s['file']."\n";
+        $msg = $msg . "\n" .
+            "============================\n" .
+            "[" . $s['class'] . $s['type'] . $s['function'] . "()]\n" .
+            "user = " . $modx->user->username . "\n" .
+            "url = " . MODX_URL_SCHEME . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] . "\n" .
+            "(line) file = (" . $s['line'] . ") " . $s['file'] . "\n";
         self::modx($msg);
         return self::__callStatic('error', array($msg));
     }
+
 //**************************************************************************************************************************************************
     public static function curl($server, array $properties = array(), $proxy = '', $timeout = 3, $isGet = false)
     {
@@ -287,10 +301,27 @@ class Msg
         curl_close($ch); // завершаем сессию
         return $output;
     }
+
+//**************************************************************************************************************************************************
+    public static function parseValue($value, $properties)
+    {
+        foreach ($properties as $k => $v)
+            $value = str_replace('[[+' . $k . ']]', $v, $value);
+
+        return $value;
+    }
+
+//**************************************************************************************************************************************************
+    public static function parseArray(& $a, $properties)
+    {
+        foreach ($a as $k => $v)
+            $a[$k] = self::parseValue($v, $properties);
+    }
+
 //**************************************************************************************************************************************************
     public static function test($properties = array())
     {
-        return 'test'.json_encode($properties);
+        return 'test' . json_encode($properties);
     }
 }
 

@@ -1,4 +1,5 @@
 <?php
+
 class MsgXpdo
 {
     /** @var string */
@@ -17,6 +18,7 @@ class MsgXpdo
         if (empty($this->method))
             $this->method = 'insert';
     }
+
 //**************************************************************************************************************************************************
     public static function getXpdo($xpdoName)
     {
@@ -27,18 +29,19 @@ class MsgXpdo
                 $className = ucfirst($xpdoName);
                 $modx->$xpdoName = new $className;
             }
-            $xpdo = & $modx->$xpdoName;
+            $xpdo = &$modx->$xpdoName;
         }
         return $xpdo;
     }
+
 //**************************************************************************************************************************************************
-        public function msg($msg = 'test', array $properties = array())
+    public function msg($msg = 'test', array $properties = array())
     {
         $output = '';
 
         if (empty($this->xpdoName))
             Msg::modx('empty xpdoName');
-        else{
+        else {
             if (empty($this->className))
                 Msg::modx('empty class');
             else {
@@ -47,17 +50,16 @@ class MsgXpdo
                     $obj = $xpdo->newObject($this->className, $properties);
                     $obj->save();
                     $output = 'ok';
-                }
-                elseif ($this->method == 'delete'){
+                } elseif ($this->method == 'delete') {
                     $obj = $xpdo->getObject($this->className, $properties);
-                    if (!empty($obj)){
+                    if (!empty($obj)) {
                         $obj->remove();
                         $output = 'ok';
                     } else
                         Msg::modx(__CLASS__ . ': Object not found');
-                }elseif ($this->method == 'update'){
+                } elseif ($this->method == 'update') {
                     $obj = $xpdo->getObject($this->className, $properties['where']);
-                    if (!empty($obj)){
+                    if (!empty($obj)) {
                         foreach ($properties['set'] as $k => $v) {
                             $obj->set($k, $v);
                         }

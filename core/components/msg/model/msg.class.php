@@ -297,7 +297,8 @@ class Msg
         $output = curl_exec($ch); // выполняем запрос
 
         if (curl_errno($ch)) {
-            Msg::curlError('server=' . $server . "\n". $modx->lexicon('msg_curlError', array('input' => json_encode($properties, JSON_UNESCAPED_UNICODE ), 'output' => $output, 'error' => curl_error($ch))));
+            Msg::modx('server=' . $server . "\n". $modx->lexicon('msg_curlError', array('input' => json_encode($properties, JSON_UNESCAPED_UNICODE ), 'output' => $output, 'error' => curl_error($ch))));
+            Msg::curlError('curlError ' . $_SERVER['SERVER_NAME']);
         }
         curl_close($ch); // завершаем сессию
         return $output;

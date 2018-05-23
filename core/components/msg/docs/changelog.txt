@@ -1,4 +1,5 @@
 Changelog for msg.
 
-2.2.0-pl
+2.3.0-pl
 ==============
+add option "server" for provider telegram

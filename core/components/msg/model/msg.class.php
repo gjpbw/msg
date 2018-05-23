@@ -11,7 +11,7 @@ class Msg
     protected $sendTo;
 
 //**************************************************************************************************************************************************
-    function __construct(array $context = array())
+    function __construct()
     {
         $this->providers = $this->parse_ini_file('providers.ini');
         $this->events = $this->parse_ini_file('events.ini');
@@ -100,53 +100,53 @@ class Msg
             else
                 $msg = $input;
             foreach ($a as $provider => $v) {
-                if ($provider == 'limit'){
-                    $limit = (int) $v;
-                }
+                if ($provider == 'limit') {
+                    $limit = (int)$v;
+                } else {
+                    if (isset($this->providers[$provider]['provider']))
+                        $providerName = strtolower($this->providers[$provider]['provider']);
+                    else
+                        $providerName = '';
 
-                if (isset($this->providers[$provider]['provider']))
-                    $providerName = strtolower($this->providers[$provider]['provider']);
-                else
-                    $providerName = '';
+                    if (empty($providerName))
+                        $providerName = $provider;
 
-                if (empty($providerName))
-                    $providerName = $provider;
+                    $s = explode(',', $v);
+                    foreach ($s as $sendTo) {
+                        $sendTo = trim($sendTo);
+                        if ($sendTo == 'sendTo')
+                            $sendTo = $properties['sendTo'];
+                        elseif ($sendTo !== 'self')
+                            $sendTo = $this->sendTo[$providerName][$sendTo];
 
-                $s = explode(',', $v);
-                foreach ($s as $sendTo) {
-                    $sendTo = trim($sendTo);
-                    if ($sendTo == 'sendTo')
-                        $sendTo = $properties['sendTo'];
-                    elseif ($sendTo !== 'self')
-                        $sendTo = $this->sendTo[$providerName][$sendTo];
+                        $properties['sendTo'] = $sendTo;
 
-                    $properties['sendTo'] = $sendTo;
+                        $msgLimit = false;
+                        if (!empty($limit)) {
+                            $hourTime = floor(time() / 3600);
+                            $keySuffix = $name . '.' . $sendTo;
+                            $lastEventTime = $modx->cacheManager->get('msg.lastEventTime.' . $keySuffix);
+                            if ((!empty($lastEventTime)) && ($lastEventTime == $hourTime)) {
+                                $lastEventCount = $modx->cacheManager->get('msg.lastEventCount.' . $keySuffix);
+                                if (!isset($lastEventCount))
+                                    $lastEventCount = 1;    //если lastEventCount нет, lastEventTime значит 1 раз уже событие было
 
-                    $msgLimit = false;
-                    if (!empty($limit)) {
-                        $hourTime = floor(time() / 3600);
-                        $keySuffix = $name . '.' . $sendTo;
-                        $lastEventTime = $modx->cacheManager->get('msg.lastEventTime.' . $keySuffix);
-                        if ((!empty($lastEventTime)) && ($lastEventTime == $hourTime)) {
-                            $lastEventCount = $modx->cacheManager->get('msg.lastEventCount.' . $keySuffix);
-                            if (!isset($lastEventCount))
-                                $lastEventCount = 1;    //если lastEventCount нет, lastEventTime значит 1 раз уже событие было
+                                $lastEventCount++;
 
-                            $lastEventCount++;
+                                $modx->cacheManager->set('msg.lastEventCount.' . $keySuffix, $lastEventCount);
+                                if ($lastEventCount == $limit)
+                                    $msg = $msg . "\n***********\n" . $modx->lexicon('msg_limit', array('event' => $name));
+                                elseif ($lastEventCount > $limit)
+                                    $msgLimit = true;
 
-                            $modx->cacheManager->set('msg.lastEventCount.' . $keySuffix, $lastEventCount);
-                            if ($lastEventCount == $limit)
-                                $msg = $modx->lexicon('msg_limit', array('event' => $name)) . "\n" . $msg;
-                            elseif ($lastEventCount > $limit)
-                                $msgLimit = true;
-
-                        } else {
-                            $modx->cacheManager->set('msg.lastEventTime.' . $keySuffix, $hourTime);
-                            $modx->cacheManager->delete('msg.lastEventCount.' . $keySuffix);
+                            } else {
+                                $modx->cacheManager->set('msg.lastEventTime.' . $keySuffix, $hourTime);
+                                $modx->cacheManager->delete('msg.lastEventCount.' . $keySuffix);
+                            }
                         }
+                        if (!$msgLimit)
+                            $output .= $this->msg($provider, $msg, $properties);
                     }
-                    if (!$msgLimit)
-                        $output .= $this->msg($provider, $msg, $properties);
                 }
             }
         } else
@@ -260,10 +260,9 @@ class Msg
         $output = curl_exec($ch); // выполняем запрос
 
         if (curl_errno($ch)) {
-            Msg::error('Вызов cURL завершился с ошибкой: "' . curl_error($ch) . '". Ответ= ' . $output);
+            Msg::curlError('Вызов cURL завершился с ошибкой: "' . curl_error($ch) . '". Ответ= ' . $output);
         }
         curl_close($ch); // завершаем сессию
-
         return $output;
     }
 //**************************************************************************************************************************************************

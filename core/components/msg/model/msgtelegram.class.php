@@ -19,8 +19,12 @@ class MsgTelegram
         $token = $properties['token'];
         if (empty($token))
             Msg::modx('Empty token. Class ' . __CLASS__);
-        else
-            $this->server ='https://api.telegram.org/bot' . $token;
+        else {
+            $server = $properties['server'];
+            if (empty($server))
+                $server = 'https://api.telegram.org';
+            $this->server = $server . '/bot' . $token;
+        }
     }
 
 //**************************************************************************************************************************************************

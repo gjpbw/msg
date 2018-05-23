@@ -4,7 +4,7 @@
 global $msg;
 if (!isset($msg)){
     include_once(MODX_CORE_PATH.'components/msg/model/msg.class.php');
-    $msg =  new Msg ($modx);
+    $msg =  new Msg();
 }
 $msg->routeEvent($modx->event->name);
 //}

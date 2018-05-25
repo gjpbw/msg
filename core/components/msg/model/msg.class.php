@@ -156,9 +156,11 @@ class Msg
                             }
                         }
                         if (!$msgLimit) {
-                            if (is_string($msg) || empty($msgSuffix))
+                            if (empty($msgSuffix)) {
+                                $output .= $this->msg($provider, $msg, $properties);
+                            } elseif (is_string($msg)) {
                                 $output .= $this->msg($provider, $msg . $msgSuffix, $properties);
-                            else {
+                            } else {
                                 $output .= $this->msg($provider, $msg, $properties);
                                 $output .= $this->msg($provider, $msgSuffix, $properties);
                             }

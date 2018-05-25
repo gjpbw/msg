@@ -1,5 +1,10 @@
 Changelog for msg.
 
+2.3.1-pl
+==============
+- error 'email array' fix
+- add telegram any methods
+
 2.3.0-pl
 ==============
-add option "server" for provider telegram
+- add option "server" for provider telegram

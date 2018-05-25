@@ -68,5 +68,23 @@ class MsgTelegram
         return $output;
     }
 //**************************************************************************************************************************************************
+public function getMsg(array $properties = array())
+{
+    $output = Msg::curl($this->server . '/getUpdates', $properties, $this->proxy, $this->timeout);
+    return $output;
+}
+
+//**************************************************************************************************************************************************
+    public function __call($name, $arguments)
+    {
+        $method = $arguments[0];
+        $properties = array();
+        if (count($arguments) > 1)
+            $properties = $arguments[1];
+
+        $output = Msg::curl($this->server . '/' . $method, $properties, $this->proxy, $this->timeout);
+        return $output;
+    }
+//**************************************************************************************************************************************************
 
 }

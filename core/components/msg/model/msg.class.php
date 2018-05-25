@@ -155,8 +155,14 @@ class Msg
                                 $modx->cacheManager->delete('msg.lastEventCount.' . $keySuffix);
                             }
                         }
-                        if (!$msgLimit)
-                            $output .= $this->msg($provider, $msg . $msgSuffix, $properties);
+                        if (!$msgLimit) {
+                            if (is_string($msg) || empty($msgSuffix))
+                                $output .= $this->msg($provider, $msg . $msgSuffix, $properties);
+                            else {
+                                $output .= $this->msg($provider, $msg, $properties);
+                                $output .= $this->msg($provider, $msgSuffix, $properties);
+                            }
+                        }
                     }
                 }
             }

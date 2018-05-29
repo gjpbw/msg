@@ -12,11 +12,15 @@ class MsgXpdo
 //**************************************************************************************************************************************************
     function __construct(array $properties = array())
     {
-        $this->xpdoName = $properties['xpdoName'];
-        $this->className = $properties['className'];
-        $this->method = strtolower($properties['method']);
-        if (empty($this->method))
-            $this->method = 'insert';
+        if (!empty($properties['xpdoName']))
+            $this->xpdoName = $properties['xpdoName'];
+
+        if (!empty($properties['className']))
+            $this->className = $properties['className'];
+
+        $this->method = 'insert';
+        if (!empty($properties['method']))
+            $this->method = strtolower($properties['method']);
     }
 
 //**************************************************************************************************************************************************

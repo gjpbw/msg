@@ -14,18 +14,20 @@ class MsgSlack
 //**************************************************************************************************************************************************
     function __construct(array $properties = array())
     {
-        $this->proxy = $properties['proxy'];
-        $this->timeout = $properties['timeout'];
-        if (empty($this->timeout))
-            $this->timeout = 3;
+        if (!empty($properties['proxy']))
+            $this->proxy = $properties['proxy'];
 
-        $server = $properties['server'];
-        if (empty($server))
-            $server = "https://hooks.slack.com";
-
+        $server = 'https://hooks.slack.com';
+        if (!empty($properties['server']))
+            $server = $properties['server'];
         $this->server = $server . '/services/';
 
-        $this->properties = $properties['properties'];
+        $this->timeout = 3;
+        if (!empty($properties['timeout']))
+            $this->timeout = $properties['timeout'];
+
+        if (!empty($properties['properties']))
+            $this->properties = $properties['properties'];
     }
 
 //**************************************************************************************************************************************************

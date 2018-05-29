@@ -44,10 +44,11 @@ class MsgEmail
     public function msg($msg = 'test', array $properties = array())
     {
         $output = '';
-        $sendTo = $properties['sendTo'];
-        if (empty($sendTo))
+
+        if (empty($properties['sendTo']))
             Msg::modx('empty sendTo');
         else {
+            $sendTo = $properties['sendTo'];
             if (is_array($sendTo)) {
                 $sendTos = $sendTo;
                 foreach ($sendTos as $sendTo)

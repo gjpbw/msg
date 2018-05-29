@@ -14,14 +14,18 @@ class MsgApi
 //**************************************************************************************************************************************************
     function __construct(array $properties = array())
     {
-        $this->proxy = $properties['proxy'];
-        $this->server = $properties['server'];
+        if (!empty($properties['proxy']))
+            $this->proxy = $properties['proxy'];
 
-        $this->timeout = $properties['timeout'];
-        if (empty($this->timeout))
-            $this->timeout = 3;
+        if (!empty($properties['server']))
+            $this->server = $properties['server'];
 
-        $this->properties = $properties['properties'];
+        $this->timeout = 3;
+        if (!empty($properties['timeout']))
+            $this->timeout = $properties['timeout'];
+
+        if (!empty($properties['properties']))
+            $this->properties = $properties['properties'];
     }
 
 //**************************************************************************************************************************************************
@@ -32,7 +36,9 @@ class MsgApi
         $server = $this->server;
         $server = Msg::parseValue($server, ['msg' => $msg]);
 
-        $properties = array_merge($this->properties, $properties);
+        if (is_array($this->properties))
+            $properties = array_merge($this->properties, $properties);
+
         Msg::parseArray($properties, ['msg' => $msg]);
 
         if (empty($this->server))

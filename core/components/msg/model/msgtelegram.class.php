@@ -8,22 +8,32 @@ class MsgTelegram
     protected $proxy;
     /** @var int */
     protected $timeout;
+    /** @var string */
+    protected $method;
 
 //**************************************************************************************************************************************************
     function __construct(array $properties = array())
     {
-        $this->proxy = $properties['proxy'];
-        $this->timeout = $properties['timeout'];
-        if (empty($this->timeout))
-            $this->timeout = 3;
+        if (!empty($properties['proxy']))
+            $this->proxy = $properties['proxy'];
 
-        $token = $properties['token'];
-        if (empty($token))
+        $this->timeout = 3;
+        if (!empty($properties['timeout']))
+            $this->timeout = $properties['timeout'];
+
+        $this->method = 'sendMessage';
+        if (!empty($properties['method']))
+            $this->method = $properties['method'];
+
+        if (empty($properties['token']))
             Msg::modx('Empty token. Class ' . __CLASS__);
         else {
-            $server = $properties['server'];
-            if (empty($server))
-                $server = 'https://api.telegram.org';
+            $token = $properties['token'];
+
+            $server = 'https://api.telegram.org';
+            if (!empty($properties['server']))
+                $server = $properties['server'];
+
             $this->server = $server . '/bot' . $token;
         }
     }
@@ -40,13 +50,15 @@ class MsgTelegram
                 $chat_id = $modx->user->Profile->get('extended')['telegram'];
             else
                 $chat_id = '';
+        } elseif ($chat_id == 'empty') {
+            // Ничего не делаем
         } elseif ((int)$chat_id == 0) {
             $user = $modx->getObject('modUser', array('username' => $chat_id));
             if (!empty($user)) {
                 $user->getOne('Profile');
                 $chat_id = trim($user->Profile->get('extended')['telegram']);
                 if (empty($chat_id))
-                    Msg::error('Ошибка! Не задан "id пользователя telegram" (поле fax в профиле) у пользователя ' . $properties['sendTo']);
+                    Msg::error('Ошибка! Не задан `id  telegram` в профиле пользователя ' . $properties['sendTo']);
             }
         }
 
@@ -58,33 +70,13 @@ class MsgTelegram
                 $chat_ids = $chat_id;
                 foreach ($chat_ids as $chat_id) {
                     $properties['chat_id'] = $chat_id;
-                    $output .= Msg::curl($this->server . '/sendMessage', $properties, $this->proxy, $this->timeout);
+                    $output .= Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
                 }
             } else {
                 $properties['chat_id'] = $chat_id;
-                $output = Msg::curl($this->server . '/sendMessage', $properties, $this->proxy, $this->timeout);
+                $output = Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
             }
         }
         return $output;
     }
-//**************************************************************************************************************************************************
-public function getMsg(array $properties = array())
-{
-    $output = Msg::curl($this->server . '/getUpdates', $properties, $this->proxy, $this->timeout);
-    return $output;
-}
-
-//**************************************************************************************************************************************************
-    public function __call($name, $arguments)
-    {
-        $method = $arguments[0];
-        $properties = array();
-        if (count($arguments) > 1)
-            $properties = $arguments[1];
-
-        $output = Msg::curl($this->server . '/' . $method, $properties, $this->proxy, $this->timeout);
-        return $output;
-    }
-//**************************************************************************************************************************************************
-
 }

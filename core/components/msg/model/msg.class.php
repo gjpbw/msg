@@ -120,9 +120,11 @@ class Msg
                     $s = explode(',', $v);
                     foreach ($s as $sendTo) {
                         $sendTo = trim($sendTo);
-                        if ($sendTo == 'sendTo')
+                        if ($sendTo == 'sendTo') {
                             $sendTo = $properties['sendTo'];
-                        elseif ($sendTo !== 'self')
+                        } elseif ($sendTo == 'empty') {
+                            // Ничего не делаем
+                        } elseif ($sendTo !== 'self')
                             $sendTo = $this->sendTo[$providerName][$sendTo];
 
                         $properties['sendTo'] = $sendTo;

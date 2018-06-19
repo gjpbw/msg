@@ -1,5 +1,15 @@
 Changelog for msg.
 
+2.3.4-pl
+==============
+- exclude plugin
++ dependence package 'autoload'
++ telegram properties
+
+2.3.3-pl
+==============
+- exclude work in cotext 'mgr'
+
 2.3.2-pl
 ==============
 - telegram any methods fix

@@ -40,16 +40,18 @@ class MsgSlack
         if (empty($properties['payload']))
             $properties['payload'] = '{"text": "' . $msg . '"}';
 
-        $chat_id = $properties['sendTo'];
-        if (empty($chat_id))
+        $sendTo = $properties['sendTo'];
+        unset($properties['sendTo']);
+
+        if (empty($sendTo))
             Msg::modx('empty sendTo (chat_id)');
         else {
-            if (is_array($chat_id)) {
-                $chat_ids = $chat_id;
-                foreach ($chat_ids as $chat_id)
-                    $output .= Msg::curl($this->server . $chat_id, $properties, $this->proxy, $this->timeout);
+            if (is_array($sendTo)) {
+                $sendTos = $sendTo;
+                foreach ($sendTos as $sendTo)
+                    $output .= Msg::curl($this->server . $sendTo, $properties, $this->proxy, $this->timeout);
             } else {
-                $output = Msg::curl($this->server . $chat_id, $properties, $this->proxy, $this->timeout);
+                $output = Msg::curl($this->server . $sendTo, $properties, $this->proxy, $this->timeout);
             }
         }
         return $output;

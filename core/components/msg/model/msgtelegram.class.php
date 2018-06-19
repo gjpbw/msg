@@ -44,36 +44,38 @@ class MsgTelegram
         global $modx;
         $output = '';
 
-        $chat_id = $properties['sendTo'];
-        if ($chat_id == 'self') {
+        $sendTo = $properties['sendTo'];
+        unset($properties['sendTo']);
+
+        if ($sendTo == 'self') {
             if (!empty($modx->user->id))
-                $chat_id = $modx->user->Profile->get('extended')['telegram'];
+                $sendTo = $modx->user->Profile->get('extended')['telegram'];
             else
-                $chat_id = '';
-        } elseif ($chat_id == 'empty') {
+                $sendTo = '';
+        } elseif ($sendTo == 'empty') {
             // Ничего не делаем
-        } elseif ((int)$chat_id == 0) {
-            $user = $modx->getObject('modUser', array('username' => $chat_id));
+        } elseif ((int)$sendTo == 0) {
+            $user = $modx->getObject('modUser', array('username' => $sendTo));
             if (!empty($user)) {
                 $user->getOne('Profile');
-                $chat_id = trim($user->Profile->get('extended')['telegram']);
-                if (empty($chat_id))
+                $sendTo = trim($user->Profile->get('extended')['telegram']);
+                if (empty($sendTo))
                     Msg::error('Ошибка! Не задан `id  telegram` в профиле пользователя ' . $properties['sendTo']);
             }
         }
 
-        if (empty($chat_id))
-            Msg::modx('empty sendTo (chat_id) ' . $properties['sendTo']);
+        if (empty($sendTo))
+            Msg::modx('empty sendTo (chat_id) ' . $sendTo);
         else {
-            $properties = array('text' => $msg);
-            if (is_array($chat_id)) {
-                $chat_ids = $chat_id;
-                foreach ($chat_ids as $chat_id) {
-                    $properties['chat_id'] = $chat_id;
+            $properties['text'] = $msg;
+            if (is_array($sendTo)) {
+                $sendTos = $sendTo;
+                foreach ($sendTos as $sendTo) {
+                    $properties['chat_id'] = $sendTo;
                     $output .= Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
                 }
             } else {
-                $properties['chat_id'] = $chat_id;
+                $properties['chat_id'] = $sendTo;
                 $output = Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
             }
         }

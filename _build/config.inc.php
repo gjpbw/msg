@@ -11,7 +11,7 @@ if (!defined('MODX_CORE_PATH')) {
 return [
     'name' => 'msg',
     'name_lower' => 'msg',
-    'version' => '2.3.2',
+    'version' => '2.3.4',
     'release' => 'pl',
     // Install package to site right after build
     'install' => true,

@@ -133,6 +133,25 @@ $success = false;
 switch ($options[xPDOTransport::PACKAGE_ACTION]) {
     case xPDOTransport::ACTION_INSTALL:
     case xPDOTransport::ACTION_UPGRADE:
+        foreach ($packages as $name => $data) {
+            if (!is_array($data)) {
+                $data = ['version' => $data];
+            }
+            $installed = $modx->getIterator('transport.modTransportPackage', ['package_name' => $name]);
+            /** @var modTransportPackage $package */
+            foreach ($installed as $package) {
+                if ($package->compareVersion($data['version'], '<=')) {
+                    continue(2);
+                }
+            }
+            $modx->log(modX::LOG_LEVEL_INFO, "Trying to install <b>{$name}</b>. Please wait...");
+            $response = $installPackage($name, $data);
+            $level = $response['success']
+                ? modX::LOG_LEVEL_INFO
+                : modX::LOG_LEVEL_ERROR;
+            $modx->log($level, $response['message']);
+        }
+
         $path = MODX_CORE_PATH . 'elements/etc/msg/';
         if (!file_exists($path)) {
             mkdir($path, 0744, true);

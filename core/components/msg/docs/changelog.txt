@@ -1,6 +1,11 @@
 Changelog for msg.
 
-2.3.4-pl
+2.3.5-pl
+==============
++ fix
++ composer compatible
+
+2.3.5-pl
 ==============
 - exclude plugin
 + dependence package 'autoload'

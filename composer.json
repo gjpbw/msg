@@ -1,0 +1,7 @@
+{
+  "name": "gjpbw/msg",
+  "description": "A basic Extra for MODx Revolution.",
+  "require": {
+    "php": "^5.3.3 || ^7.0"
+  }
+}

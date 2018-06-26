@@ -1,7 +1,24 @@
 {
   "name": "gjpbw/msg",
-  "description": "A basic Extra for MODx Revolution.",
+  "description": "Пакет msg для MODx Revolution.",
+  "keywords": ["msg", "MODX"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dmitriy Lomakin",
+      "email": "gjpbw.ld@gmail.com",
+      "homepage": "https://github.com/gjpbw"
+    }
+  ],
   "require": {
-    "php": "^5.3.3 || ^7.0"
+    "php": "^7.0"
+  },
+  "autoload": {
+    "psr-0": {"Msg": ""}
+  },
+  "scripts": {
+    "post-package-install": "gjpbw\\Msg::install",
+    "post-package-update": "gjpbw\\Msg::update",
+    "pre-package-uninstall": "gjpbw\\Msg::uninstall"
   }
 }

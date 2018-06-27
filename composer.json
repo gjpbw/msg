@@ -20,8 +20,8 @@
     }
   },
   "scripts": {
-    "post-package-install": "@php src/scripts/install.php",
-    "post-package-update": "@php src/scripts/install.php",
-    "pre-package-uninstall": "@php src/scripts/uninstall.php"
+    "post-package-install": "php src/scripts/install.php",
+    "post-package-update": "php src/scripts/install.php",
+    "pre-package-uninstall": "php src/scripts/uninstall.php"
   }
 }

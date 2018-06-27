@@ -1,10 +1,20 @@
 <?php
-$corePath = dirname(dirname(__FILE__));
-$modxCorePath = dirname(dirname(dirname($corePath)));
-$target = $modxCorePath . 'elements/etc/msg/';
+$packageCorePath = dirname(dirname(dirname(__FILE__)));
+
+// Подключаем MODX
+define('MODX_API_MODE', true);
+require dirname(dirname(dirname(dirname($packageCorePath)))).'/index.php';
+
+// Включаем обработку ошибок
+$modx->getService('error','error.modError');
+$modx->setLogLevel(modX::LOG_LEVEL_FATAL);
+$modx->setLogTarget(XPDO_CLI_MODE ? 'ECHO' : 'HTML');
+$modx->error->message = null; // Обнуляем переменную
+
+$target = MODX_CORE_PATH . 'elements/etc/msg/';
 if (!file_exists($target)) {
     mkdir($target, 0744, true);
-    $source = $corePath . 'etc/msg';
+    $source = $packageCorePath . 'etc/msg';
     $files = glob($source . '/*.ini');
     foreach ($files as $file)
         copy($file, $target . basename($file));

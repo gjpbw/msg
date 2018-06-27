@@ -1,5 +1,4 @@
 <?php
-
 class Msg
 {
     const MODX_ELEMENTS_PATH = MODX_CORE_PATH . 'elements/';
@@ -40,8 +39,8 @@ class Msg
                 $className = $this->providers[$providerName]['provider'];
             } else
                 $className = $providerName;
-            $className = 'Msg' . ucfirst($className);
-            $file = dirname(__FILE__) . '/' . strtolower($className) . '.class.php';
+            $className = ucfirst(strtolower($className));
+            $file = dirname(__FILE__) . '/Msg/' . $className . '.php';
             if (file_exists($file)) {
                 include_once $file;
 
@@ -50,7 +49,8 @@ class Msg
                 else
                     $properties = array();
 
-                $this->providers[$providerName]['obj'] = new $className ($properties);
+                $fullClassName = 'Msg\\' . $className;
+                $this->providers[$providerName]['obj'] = new $fullClassName ($properties);
             } else
                 self::modx('ERROR: File is not found: ' . $file);
         }
@@ -227,7 +227,7 @@ class Msg
         $file = dirname(__FILE__) . 'msgemail.class.php';
         if (file_exists($file)) {
             include_once $file;
-            $email = new MsgEmail();
+            $email = new Msg\Email();
             $properties['sendTo'] = $sendTo;
             $output = $email->msg($msg, $properties);
         }
@@ -312,7 +312,6 @@ class Msg
         foreach ($a as $k => $v)
             $a[$k] = self::parseValue($v, $properties);
     }
-
 //**************************************************************************************************************************************************
     public static function test($properties = array())
     {

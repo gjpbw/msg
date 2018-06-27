@@ -14,11 +14,14 @@
     "php": "^7.0"
   },
   "autoload": {
-    "psr-0": {"Msg": ""}
+    "psr-0": {
+      "Msg": "src/",
+      "Msg\\": "src/Msg/"
+    }
   },
   "scripts": {
-    "post-package-install": "gjpbw\\Msg::install",
-    "post-package-update": "gjpbw\\Msg::update",
-    "pre-package-uninstall": "gjpbw\\Msg::uninstall"
+    "post-package-install": "@php src/scripts/install.php",
+    "post-package-update": "@php src/scripts/install.php",
+    "pre-package-uninstall": "@php src/scripts/uninstall.php"
   }
 }

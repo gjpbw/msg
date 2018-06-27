@@ -1,6 +1,7 @@
 <?php
+namespace Msg;
 
-class MsgEmail
+class Email
 {
 //**************************************************************************************************************************************************
     private function run($msg, $sendTo)
@@ -18,16 +19,16 @@ class MsgEmail
         if (!empty($sendTo)) {
 
             $modx->getService('mail', 'mail.modPHPMailer');
-            $modx->mail->set(modMail::MAIL_FROM, $modx->getOption('emailsender'));
-            $modx->mail->set(modMail::MAIL_FROM_NAME, $modx->getOption('site_name'));
-            $modx->mail->set(modMail::MAIL_SENDER, $modx->getOption('emailsender'));
+            $modx->mail->set(\modMail::MAIL_FROM, $modx->getOption('emailsender'));
+            $modx->mail->set(\modMail::MAIL_FROM_NAME, $modx->getOption('site_name'));
+            $modx->mail->set(\modMail::MAIL_SENDER, $modx->getOption('emailsender'));
 
             if (is_array($msg)) {
-                $modx->mail->set(modMail::MAIL_SUBJECT, $msg['subject']);
-                $modx->mail->set(modMail::MAIL_BODY, $msg['body']);
+                $modx->mail->set(\modMail::MAIL_SUBJECT, $msg['subject']);
+                $modx->mail->set(\modMail::MAIL_BODY, $msg['body']);
             } else {
-                $modx->mail->set(modMail::MAIL_SUBJECT, $msg);
-                $modx->mail->set(modMail::MAIL_BODY, $msg);
+                $modx->mail->set(\modMail::MAIL_SUBJECT, $msg);
+                $modx->mail->set(\modMail::MAIL_BODY, $msg);
             }
 
             $modx->mail->address('to', $sendTo, $sendTo);
@@ -46,7 +47,7 @@ class MsgEmail
         $output = '';
 
         if (empty($properties['sendTo']))
-            Msg::modx('empty sendTo');
+            \Msg::modx('empty sendTo');
         else {
             $sendTo = $properties['sendTo'];
             if (is_array($sendTo)) {

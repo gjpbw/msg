@@ -1,6 +1,7 @@
 <?php
+namespace Msg;
 
-class MsgSlack
+class Slack
 {
     /** @var string */
     protected $server;
@@ -44,14 +45,14 @@ class MsgSlack
         unset($properties['sendTo']);
 
         if (empty($sendTo))
-            Msg::modx('empty sendTo (chat_id)');
+            \Msg::modx('empty sendTo (chat_id)');
         else {
             if (is_array($sendTo)) {
                 $sendTos = $sendTo;
                 foreach ($sendTos as $sendTo)
-                    $output .= Msg::curl($this->server . $sendTo, $properties, $this->proxy, $this->timeout);
+                    $output .= \Msg::curl($this->server . $sendTo, $properties, $this->proxy, $this->timeout);
             } else {
-                $output = Msg::curl($this->server . $sendTo, $properties, $this->proxy, $this->timeout);
+                $output = \Msg::curl($this->server . $sendTo, $properties, $this->proxy, $this->timeout);
             }
         }
         return $output;

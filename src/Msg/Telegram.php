@@ -1,6 +1,7 @@
 <?php
+namespace Msg;
 
-class MsgTelegram
+class Telegram
 {
     /** @var string */
     protected $server;
@@ -26,7 +27,7 @@ class MsgTelegram
             $this->method = $properties['method'];
 
         if (empty($properties['token']))
-            Msg::modx('Empty token. Class ' . __CLASS__);
+            \Msg::modx('Empty token. Class ' . __CLASS__);
         else {
             $token = $properties['token'];
 
@@ -60,23 +61,23 @@ class MsgTelegram
                 $user->getOne('Profile');
                 $sendTo = trim($user->Profile->get('extended')['telegram']);
                 if (empty($sendTo))
-                    Msg::error('Ошибка! Не задан `id  telegram` в профиле пользователя ' . $properties['sendTo']);
+                    \Msg::error('Ошибка! Не задан `id  telegram` в профиле пользователя ' . $properties['sendTo']);
             }
         }
 
         if (empty($sendTo))
-            Msg::modx('empty sendTo (chat_id) ' . $sendTo);
+            \Msg::modx('empty sendTo (chat_id) ' . $sendTo);
         else {
             $properties['text'] = $msg;
             if (is_array($sendTo)) {
                 $sendTos = $sendTo;
                 foreach ($sendTos as $sendTo) {
                     $properties['chat_id'] = $sendTo;
-                    $output .= Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
+                    $output .= \Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
                 }
             } else {
                 $properties['chat_id'] = $sendTo;
-                $output = Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
+                $output = \Msg::curl($this->server . '/' . $this->method, $properties, $this->proxy, $this->timeout);
             }
         }
         return $output;

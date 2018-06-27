@@ -1,6 +1,7 @@
 <?php
+namespace Msg;
 
-class MsgApi
+class Api
 {
     /** @var string */
     protected $server;
@@ -34,32 +35,32 @@ class MsgApi
         $output = '';
 
         $server = $this->server;
-        $server = Msg::parseValue($server, ['msg' => $msg]);
+        $server = \Msg::parseValue($server, ['msg' => $msg]);
 
         if (is_array($this->properties))
             $properties = array_merge($this->properties, $properties);
 
-        Msg::parseArray($properties, ['msg' => $msg]);
+        \Msg::parseArray($properties, ['msg' => $msg]);
 
         if (empty($this->server))
-            Msg::modx('empty server');
+            \Msg::modx('empty server');
         else {
             $sendTo = $properties['sendTo'];
             unset($properties['sendTo']);
             if (empty($sendTo))
-                $output = Msg::curl($server, $properties, $this->proxy, $this->timeout);
+                $output = \Msg::curl($server, $properties, $this->proxy, $this->timeout);
             else {
                 if (is_array($sendTo)) {
                     $sendTos = $sendTo;
                     foreach ($sendTos as $sendTo) {
-                        $server = Msg::parseValue($server, ['sendTo' => $sendTo]);
-                        Msg::parseArray($properties, ['sendTo' => $sendTo]);
-                        $output .= Msg::curl($server, $properties, $this->proxy, $this->timeout);
+                        $server = \Msg::parseValue($server, ['sendTo' => $sendTo]);
+                        \Msg::parseArray($properties, ['sendTo' => $sendTo]);
+                        $output .= \Msg::curl($server, $properties, $this->proxy, $this->timeout);
                     }
                 } else {
-                    $server = Msg::parseValue($server, ['sendTo' => $sendTo]);
-                    Msg::parseArray($properties, ['sendTo' => $sendTo]);
-                    $output = Msg::curl($server, $properties, $this->proxy, $this->timeout);
+                    $server = \Msg::parseValue($server, ['sendTo' => $sendTo]);
+                    \Msg::parseArray($properties, ['sendTo' => $sendTo]);
+                    $output = \Msg::curl($server, $properties, $this->proxy, $this->timeout);
                 }
             }
         }

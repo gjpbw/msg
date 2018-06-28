@@ -43,3 +43,5 @@ if (empty($category)) {
     $category->save();
 
 }
+
+echo 123;

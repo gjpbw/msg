@@ -20,7 +20,8 @@
     }
   },
   "scripts": {
-    "post-package-install": "\\Msg\\Installer::install",
+    "post-install-cmd": "\\Msg\\Installer::install",
+    "post-package-install": "\\qqqqqqqq\\Installer::install",
     "post-package-update": "php src/scripts/install.php",
     "pre-package-uninstall": "echo 123;"
   }

@@ -1,0 +1,7 @@
+{
+  "namespace": {
+    "name": "msg",
+    "path": "{core_path}components/msg/",
+    "assets_path": ""
+  }
+}

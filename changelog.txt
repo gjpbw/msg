@@ -1,5 +1,9 @@
 Changelog for msg.
 
+2.3.7-pl
+==============
++ fix
++ package gjpbw/autoload compatible
 2.3.5-pl
 ==============
 + fix

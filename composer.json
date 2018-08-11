@@ -18,8 +18,5 @@
       "Msg": "src/",
       "Msg\\": "src/Msg/"
     }
-  },
-  "extra": {
-    "is_modx_package": "true"
   }
 }

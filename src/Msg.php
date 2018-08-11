@@ -68,7 +68,7 @@ class Msg
         $msgSuffix = '';
 
         $limit = 0;
-        $modx->lexicon->load('msg:default');
+        $modx->lexicon->load('gjpbw-msg:default');
 
         $a = $this->events[$name];
         if (is_array($a)) {
@@ -267,7 +267,7 @@ class Msg
     public static function curl($server, array $properties = array(), $proxy = '', $timeout = 3, $isGet = false)
     {
         global $modx;
-        $modx->lexicon->load('msg:default');
+        $modx->lexicon->load('gjpbw-msg:default');
 //        foreach ($properties as $k => $v)
 //            $properties[$k] = str_replace('"', '\"', $v);
 
